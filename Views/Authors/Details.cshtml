@@ -1,0 +1,62 @@
+﻿@using BookReview.Infrastructura.Bussines.Expensive_Method;
+@model BookReview.Domain.Models.DetailsViewAuthorsAndBooks
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Про автора</h2>
+<div class="form-group">
+    <h2>@Model.Author.Name @Model.Author.Surname</h2>
+    <div class="row align-items-start">
+        <div class="col">
+            <img src="@Model.Author.PathToImage" class="img-thumbnail" alt="Картинка відсутня" />
+        </div>
+        <div class="col">
+            <label name="RationOfAuthor" class="control-label col-md-2">Рейтинг автора: @Model.Author.RaitingInPersent</label>
+            <label name="Vote" class="control-label col-md-2">Кількість голосів: @Model.Author.Vote</label>
+            <label name="CountOfBooks" class="control-label col-md-2">Кількість книг: @Model.PageInfo.TotalItems </label>
+            <label class="center-block">Жанри:</label>
+            <div class="btn-group" role="group" aria-label="Basic outlined example">
+                @foreach (var genre in Model.Author.Genre)
+                {
+                    <a href="#" class="btn btn-outline-primary">@genre</a>
+                }
+            </div>
+
+        </div>
+
+        @*Акордеон Про автора*@
+        <div class="accordion" id="accordionAboutOfAuthor">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Про автора
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionAboutOfAuthor">
+                    <div class="accordion-body">
+                        @Model.Author.AboutOfAuthor
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @foreach (var book in Model.Books)
+        {
+            <div class="row">
+                <div class="col-lg-3">
+                    <img src="@book.PathToImage" alt="Картинка відсутня..." />
+                </div>
+                <div class="col-lg-9">
+                    <p>@Html.ActionLink($"{book.NameOfBook}", "Details", "Books", new { id = book.BookId }, new { @class = "col-10" }))</p>
+                    <p>@book.AboutOfBook.Take(200)</p>
+                </div>
+            </div>
+        }
+        <div class="btn-group">
+            @Html.PageLinks(Model.PageInfo, x => Url.Action("Details", new { page = x}))
+        </div>
+    </div>
+</div>

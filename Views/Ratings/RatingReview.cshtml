@@ -1,0 +1,42 @@
+﻿@using BookReview.Infrastructura.Bussines.Expensive_Method;
+@model BookReview.Arhitecture.Domain.Models.RatingViews.IndexViewRatingReview
+
+@foreach (var review in Model.Reviews)
+{
+    <div class="form-group">
+        <div class="row justify-content-between">
+            <div class="col-4">
+                @Html.ActionLink($"{review.Book.NameOfBook}, {review.Book.Author.Name} {review.Book.Author.Surname}", "Details", "Books", new { id = review.BookId }, new { @class = "col-10" });
+            </div>
+            <div class="col-4">
+                <p>
+                    @(review.IsPositive == true ? "<span class=\"text-success\">Позитивна</span>" : "<span class=\"text - danger\">Негативна</span>")
+                </p>
+
+            </div>
+            <div class="col-4">
+                @review.Vote
+            </div>
+        </div>
+        <div class="row align-items-start">
+            <div class="col">
+                <label class="badge bg-light text-dark">@(review.AppUser.NickName ?? review.AppUser.UserName )</label>
+                <img src="@review.Book.PathToImage" class="img-thumbnail" alt="Картинка відсутня" />
+            </div>
+            <div class="col">
+                <div class="row align-items-start">
+                    <div class="col">
+                        <p name="review">@review.TextOfReview</p>
+                       
+                    </div>
+                </div>
+                    <div class="center-block">
+                        @Html.ActionLink("Читати книгу", "Details", "Books", new { id = review.BookId }, new { @class = "col-10" })
+                    </div>
+            </div>
+        </div>
+    </div>
+}
+<div class="btn-group">
+    @Html.PageLinks(Model.PageInfo, x => Url.Action("RatingReview", new { page = x }))
+</div>

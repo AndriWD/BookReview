@@ -1,0 +1,83 @@
+﻿@using BookReview.Infrastructura.Bussines.Expensive_Method;
+@model BookReview.Domain.Models.DetailsViewBooksAndReviews
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Про книгу</h2>
+
+<div class="form-group">
+    <h2>@Model.Book.NameOfBook</h2>
+    <div class="row align-items-start">
+        <div class="col">
+            <img src="@Model.Book.PathToImage" class="img-thumbnail" alt="Картинка відсутня" />
+        </div>
+        <div class="col">
+            @Html.ActionLink($"Автор: {Model.Book.Author.Name} {Model.Book.Author.Surname}", "Details", "Authors", new { id = Model.Book.AuthorId }, new { @class = "col-10" })
+            <label name="RationOfBook" class="control-label col-md-2">Рейтинг книги: @Model.Book.RaitingInPersent</label>
+            <label name="Vote" class="control-label col-md-2">Кількість голосів: @Model.Book.Vote</label>
+            <lable name="Year" class="control-label col-md-2">Рік випуску: @Model.Book.Year</lable>
+            <label name="CountOfBooks" class="control-label col-md-2">Кількість сторінок: @Model.Book.CountOfPage </label>
+            <label class="center-block">Жанри:</label>
+            <div class="btn-group" role="group" aria-label="Basic outlined example">
+                @foreach (var genre in Model.Book.Genre)
+                {
+                    <a href="#" class="btn btn-outline-primary">@genre</a>
+                }
+            </div>
+
+        </div>
+        </div>
+        @*Акордеон  Опис книги*@
+        <div class="accordion" id="accordionAboutOfBook">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Опис книги
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionAboutOfBook">
+                    <div class="accordion-body">
+                        @Model.Book.AboutOfBook
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*Акордеон  по рецензіях*@
+        <h2 class="center-block">Рецензії</h2>
+        @foreach (var review in Model.Reviews)
+        {
+            <div class="accordion" id="accordionAboutOfBook">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            @(review.AppUser.NickName ?? review.AppUser.UserName )
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionAboutOfBook">
+                        <div class="accordion-body">
+                            <div class="row">
+                                <p class="center-block">@(review.IsPositive == true ? "<span class=\"text-success\">Позитивна</span>" : "<span class=\"text - danger\">Негативна</span>")</p>
+                                <div class="col-lg-3">
+                                    <label class="badge bg-light text-dark">@(review.AppUser.NickName ?? review.AppUser.UserName )</label>
+                                </div>
+                                <div class="col-lg-9">
+                                    <<p>@review.TextOfReview</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+     
+                </div>
+            </div>
+        }
+        <div class="btn-group">
+            @Html.PageLinks(Model.PageInfo, x => Url.Action("Details", new { page = x }))
+        </div>
+        </div>
+ 
+
+

@@ -1,0 +1,45 @@
+﻿@using BookReview.Infrastructura.Bussines.Expensive_Method;
+@model BookReview.Domain.Models.IndexViewAuthor
+
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <h2>Автори</h2>
+
+    @foreach (var author in Model.Authors)
+    {
+        <div class="form-group">
+            @Html.ActionLink($"{author.Name} {author.Surname}", "Details", "Authors", new { id = author.AuthorId }, new { @class = "col-10" });
+            @*<a href="/Authors/Details/@author.AuthorId">@author.Name @author.Surname</a> ///old version*@
+            <div class="row align-items-start">
+                <div class="col">
+                    <img src="@author.PathToImage" class="img-thumbnail" alt="Картинка відсутня" />
+                </div>
+                <div class="col">
+                    <label name="RatingOfAuthor" class="control-label col-md-2">Руйтинг: @String.Format("{0:0.00}", author.RaitingInPersent)</label>
+                    <label name="Vote" class="control-label col-md-2">Кількість голосів: @author.VoteCounter</label>
+                    <label class="center-block">Жанри:</label>
+                    <div class="btn-group" role="group" aria-label="Basic outlined example">
+                        @foreach (var genre in author.Genre)
+                        {
+                            <a href="#" class="btn btn-outline-primary">@genre</a>
+                        }
+                    </div>
+                    <span class="a-book">Кількість книг: </span>
+                    @Html.ActionLink($"{author.Books.Count}", "Details", "Authors", new { id = author.AuthorId }, new { @class = "col-10" })                   
+                    </div>
+                    <h2 class="center-block">Про автора</h2>
+                    <p mame="AboutOfAuthor">@author.AboutOfAuthor.Take(200) ...</p>
+                    @Html.ActionLink("Читати далі...", "Details", "Authors", new { id = author.AuthorId }, new { @class = "center-block" });
+                </div>
+        </div>
+    }
+    <div class="btn-group">
+        @Html.PageLinks(Model.PageInfo, x => Url.Action("Index", new { page = x }))
+    </div>
+</div>
+

@@ -1,0 +1,37 @@
+﻿@using BookReview.Infrastructura.Bussines.Expensive_Method;
+@model BookReview.Arhitecture.Domain.Models.RatingViews.IndexViewRatingAuthor
+
+
+
+    @foreach (var author in Model.Authors)
+    {
+        <div class="form-group">
+            
+            <div class="row align-items-start">
+                <div class="col">
+                    <img src="@author.PathToImage" class="img-thumbnail" alt="Картинка відсутня" />
+                </div>
+                <div class="col">
+                    @Html.ActionLink($"{author.Name} {author.Surname}", "Details", "Authors", new { id = author.AuthorId }, new { @class = "col-10" });
+                </div>
+                <div class="col">
+                    <label name="RatingOfAuthor" class="control-label col-md-2">Руйтинг: @String.Format("{0:0.00}", author.RaitingInPersent)</label>
+                    </div>
+                    <div class="col">
+                        <div class="btn-group" role="group" aria-label="Basic outlined example">
+                            @foreach (var genre in author.Genre)
+                            {
+                                <a href="#" class="btn btn-outline-primary">@genre </a>
+                            }
+                        </div>
+                    </div>
+                    <h2 class="center-block">Про автора</h2>
+                    <p mame="AboutOfAuthor">@author.AboutOfAuthor.Take(200) ...</p>
+                    @Html.ActionLink("Читати далі...", "Details", "Authors", new { id = author.AuthorId }, new { @class = "center-block" });
+                </div>
+            </div>
+    }
+    <div class="btn-group">
+        @Html.PageLinks(Model.PageInfo, x => Url.Action("RatingAuthor", new { page = x }))
+    </div>
+

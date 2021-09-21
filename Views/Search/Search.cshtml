@@ -1,0 +1,123 @@
+﻿@model BookReview.Arhitecture.Domain.Models.SearchResult
+
+<h2>Автори: </h2>
+@if (Model.Authors == null)
+{
+    <p>Авторів по даному запиту не знайдено!</p>
+}
+else
+{
+    foreach (var author in Model.Authors)
+    {
+        <div class="form-group">
+
+            <div class="row align-items-start">
+                <div class="col">
+                    <img src="@author.PathToImage" class="img-thumbnail" alt="Картинка відсутня" />
+                </div>
+                <div class="col">
+                    @Html.ActionLink($"{author.Name} {author.Surname}", "Details", "Authors", new { id = author.AuthorId }, new { @class = "col-10" });
+                </div>
+                <div class="col">
+                    <label name="RatingOfAuthor" class="control-label col-md-2">Руйтинг: @String.Format("{0:0.00}", author.RaitingInPersent)</label>
+                </div>
+                <div class="col">
+                    <div class="btn-group" role="group" aria-label="Basic outlined example">
+                        @foreach (var genre in author.Genre)
+                        {
+                            <a href="#" class="btn btn-outline-primary">@genre </a>
+                        }
+                    </div>
+                </div>
+                <h2 class="center-block">Про автора</h2>
+                <p mame="AboutOfAuthor">@author.AboutOfAuthor.Take(200) ...</p>
+                @Html.ActionLink("Читати далі...", "Details", "Authors", new { id = author.AuthorId }, new { @class = "center-block" });
+            </div>
+        </div>
+    }
+}
+<br />
+<h2>Книги: </h2>
+@if (Model.Books == null)
+{
+    <p>Книг по даному запиту не знайдено!</p>
+}
+else
+{
+    foreach (var book in Model.Books)
+    {
+        <div class="form-group">
+
+            <div class="row align-items-start">
+                <div class="col">
+                    <img src="@book.PathToImage" class="img-thumbnail" alt="Картинка відсутня" />
+                </div>
+                <div class="row align-items-start">
+                    <div class="col">
+                        @Html.ActionLink($"{book.NameOfBook}", "Details", "Books", new { id = book.BookId }, new { @class = "col-10" });
+                        @Html.ActionLink($"{book.Author.Name} {book.Author.Surname}", "Details", "Authors", new { id = book.AuthorId }, new { @class = "col-10" });
+                    </div>
+                    <div class="col">
+
+                        <label name="RatingOfAuthor">Руйтинг: @String.Format("{0:0.00}", book.RaitingInPersent)</label>
+                    </div>
+                </div>
+                <div class="btn-group" role="group" aria-label="Basic outlined example">
+                    @foreach (var genre in book.Genre)
+                    {
+                        <a href="#" class="btn btn-outline-primary">@genre</a>
+                    }
+                </div>
+
+                <h2 class="center-block">Опис книги</h2>
+                <p mame="AboutOfAuthor">@book.AboutOfBook.Take(200) ...</p>
+                @Html.ActionLink($"Читати далі...", "Details", "Books", new { id = book.BookId }, new { @class = "center-block" });
+            </div>
+        </div>
+    }
+}
+<br />
+<h2>Рецензії: </h2>
+@if (Model.Reviews == null)
+{
+    <p>Рецензій по даному запиту не знайдено!</p>
+}
+else
+{
+    foreach (var review in Model.Reviews)
+    {
+        <div class="form-group">
+            <div class="row justify-content-between">
+                <div class="col-4">
+                    @Html.ActionLink($"{review.Book.NameOfBook}, {review.Book.Author.Name} {review.Book.Author.Surname}", "Details", "Books", new { id = review.BookId }, new { @class = "col-10" });
+                </div>
+                <div class="col-4">
+                    <p>
+                        @(review.IsPositive == true ? "<span class=\"text-success\">Позитивна</span>" : "<span class=\"text - danger\">Негативна</span>")
+                    </p>
+
+                </div>
+                <div class="col-4">
+                    @review.Vote
+                </div>
+            </div>
+            <div class="row align-items-start">
+                <div class="col">
+                    <label class="badge bg-light text-dark">@(review.AppUser.NickName ?? review.AppUser.UserName )</label>
+                    <img src="@review.Book.PathToImage" class="img-thumbnail" alt="Картинка відсутня" />
+                </div>
+                <div class="col">
+                    <div class="row align-items-start">
+                        <div class="col">
+                            <p name="review">@review.TextOfReview</p>
+
+                        </div>
+                    </div>                 
+                        <div class="center-block">
+                            @Html.ActionLink("Читати книгу", "Details", "Books", new { id = review.BookId }, new { @class = "col-10" })
+                        </div>                   
+                </div>
+            </div>
+        </div>
+    }
+}
