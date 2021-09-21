@@ -11,79 +11,80 @@ namespace BookReview.Infrastructura.Bussines.Expensive_Method
 {
     public static class ExtensionMethods
     {
-        public static void Vote(this Object obj, bool isPositive)
+        public static void Vote(this Author author, bool isPositive)
         {
-            //перевірка
-            if (obj == null) 
+            if (author == null)
             {
-                throw new NullReferenceException("Обєкта не існує");
+                throw new NullReferenceException("Автора не вибрано");
             }
 
-            
-            if (obj is Author author)
+            if (isPositive == true)
             {
-                if (isPositive == true)
-                {
-                    author.Vote += 1;
-                    author.VoteCounter += 1;
-                    
-                }
-                else
-                {
-                    author.Vote -= 1;
-                    author.VoteCounter += 1;
-                    
-                }
+                author.Vote += 1;
+                author.VoteCounter += 1;
+
             }
-            else if (obj is Book book)
+            else
             {
-                if (isPositive == true)
-                {
-                    book.Vote += 1;
-                    book.VoteCounter += 1;
-                    //також голоси добавляються і автору, так набагато швидше ніж було б звернення до БД
-                    book.Author.Vote += 1;
-                    book.Author.VoteCounter += 1;
-                    
-                }
-                else
-                {
-                    book.Vote -= 1;
-                    book.VoteCounter += 1;
+                author.Vote -= 1;
+                author.VoteCounter += 1;
 
-                    book.Author.Vote -= 1;
-                    book.Author.VoteCounter += 1;
-                   
-                }
             }
-            else if (obj is Review review)
+        }
+        public static void Vote(this Book book, bool isPositive)
+        {
+            if (book == null)
             {
-                if (isPositive == true)
-                {
-                    review.Vote += 1;
-                    review.VoteCounter += 1;
-
-                    review.Book.Vote += 1;
-                    review.Book.VoteCounter += 1;
-
-                    review.Book.Author.Vote += 1;
-                    review.Book.Author.VoteCounter += 1;
-                }
-                else
-                {
-                    review.Vote -= 1;
-                    review.VoteCounter += 1;
-
-                    review.Book.Vote -= 1;
-                    review.Book.VoteCounter += 1;
-
-                    review.Book.Author.Vote -= 1;
-                    review.Book.Author.VoteCounter += 1;
-                }
+                throw new NullReferenceException("Книгу не вибрано");
             }
-            else //додаткова перевірка, про всякий випадок
+
+            if (isPositive == true)
             {
-                throw new TypeAccessException("Використовується обєкт, за який не можна проголосувати");
+                book.Vote += 1;
+                book.VoteCounter += 1;
+                
+                book.Author.Vote += 1;
+                book.Author.VoteCounter += 1;
+
+            }
+            else
+            {
+                book.Vote -= 1;
+                book.VoteCounter += 1;
+
+                book.Author.Vote -= 1;
+                book.Author.VoteCounter += 1;
+
+            }
+        }
+        public static void Vote(this Review review, bool isPositive)
+        {
+            if (review == null)
+            {
+                throw new NullReferenceException("Рецензію не вибрано");
+            }
+
+            if (isPositive == true)
+            {
+                review.Vote += 1;
+                review.VoteCounter += 1;
+
+                review.Book.Vote += 1;
+                review.Book.VoteCounter += 1;
+
+                review.Book.Author.Vote += 1;
+                review.Book.Author.VoteCounter += 1;
+            }
+            else
+            {
+                review.Vote -= 1;
+                review.VoteCounter += 1;
+
+                review.Book.Vote -= 1;
+                review.Book.VoteCounter += 1;
+
+                review.Book.Author.Vote -= 1;
+                review.Book.Author.VoteCounter += 1;
             }
         }
         public static MvcHtmlString PageLinks(this HtmlHelper html, PageInfo pageInfo, Func<int, string> pageUrl)

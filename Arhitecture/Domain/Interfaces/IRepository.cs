@@ -21,10 +21,22 @@ namespace BookReview.Domain.Interfaces
         /// Отримати конкретний об'єкт за ідентифікатором
         /// </summary>
         /// <param name="id">Ідентифікатор</param>
-        /// <returns></returns>
+        /// <returns>Об'єкт типу T за ідентифікатором</returns>
         T GetItem(int id);
+        /// <summary>
+        /// Додати об'єкт типу T до БД
+        /// </summary>
+        /// <param name="item">Об'єкт типу T</param>
         void Create(T item);
+        /// <summary>
+        /// Оновити об'єкт типу T в БД
+        /// </summary>
+        /// <param name="item">Об'єкт типу T</param>
         void Update(T item);
+        /// <summary>
+        /// Видалити об'єкт типу T з БД за ідентифікатором
+        /// </summary>
+        /// <param name="id">Ідентифікатор</param>
         void Delate(int id);
 
 
