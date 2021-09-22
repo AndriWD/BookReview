@@ -17,10 +17,11 @@ namespace BookReview.Controllers
     public class BooksController : Controller
     {
         ///функція Create Get + Post
-        private ApplicationDbContext db = new ApplicationDbContext();
+        private ApplicationDbContext db;
         List<Book> Books;
         public BooksController()
         {
+            db = new ApplicationDbContext();
             Books = db.Books.ToList();
         }
 

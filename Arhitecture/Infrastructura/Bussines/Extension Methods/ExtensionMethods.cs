@@ -9,8 +9,16 @@ using System.Web.Mvc;
 
 namespace BookReview.Infrastructura.Bussines.Expensive_Method
 {
+    /// <summary>
+    /// Методи розширення
+    /// </summary>
     public static class ExtensionMethods
     {
+        /// <summary>
+        /// Проголосувати за автора
+        /// </summary>
+        /// <param name="author">Автор</param>
+        /// <param name="isPositive">Чи голос позитивний</param>
         public static void Vote(this Author author, bool isPositive)
         {
             if (author == null)
@@ -31,6 +39,11 @@ namespace BookReview.Infrastructura.Bussines.Expensive_Method
 
             }
         }
+        /// <summary>
+        /// Проголосувати за книгу
+        /// </summary>
+        /// <param name="book">Книга</param>
+        /// <param name="isPositive">Чи голос позитивний</param>
         public static void Vote(this Book book, bool isPositive)
         {
             if (book == null)
@@ -57,6 +70,11 @@ namespace BookReview.Infrastructura.Bussines.Expensive_Method
 
             }
         }
+        /// <summary>
+        /// Проголосувати за рецензію
+        /// </summary>
+        /// <param name="review">Рецензія</param>
+        /// <param name="isPositive">Чи голос позитивний</param>
         public static void Vote(this Review review, bool isPositive)
         {
             if (review == null)
@@ -87,6 +105,13 @@ namespace BookReview.Infrastructura.Bussines.Expensive_Method
                 review.Book.Author.VoteCounter += 1;
             }
         }
+        /// <summary>
+        /// HTML хелпер додавання посилань на наступні сторінки при використанні класу PageInfo
+        /// </summary>
+        /// <param name="html">HTMLHelper</param>
+        /// <param name="pageInfo">Дані про сторінки</param>
+        /// <param name="pageUrl">Посилання</param>
+        /// <returns>Посилання на інші сторінки з PageInfo</returns>
         public static MvcHtmlString PageLinks(this HtmlHelper html, PageInfo pageInfo, Func<int, string> pageUrl)
         {
             StringBuilder result = new StringBuilder();

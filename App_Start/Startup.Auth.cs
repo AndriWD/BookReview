@@ -60,8 +60,8 @@ namespace BookReview
 
             app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             {
-                ClientId = "997530675386-4ccuh9g5jnusfrpa993sopi9bl82legv.apps.googleusercontent.com",
-                ClientSecret = "RMeNS3pxAP96cYezW9RyDFZ-"
+                ClientId = "#",
+                ClientSecret = "#"
             });
         }
     }

@@ -8,15 +8,21 @@ using System.Web;
 
 namespace BookReview.Arhitecture.Infrastructura.DAL
 {
+    /// <summary>
+    /// Реалізація паттерну UnitOfWork для обєднання дани всіх репозиторіїв
+    /// </summary>
     public class UnitOfWork : IUnitOfWork
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-        //реалізовано Singelton
+        //реалізовано через використання паттерну Singelton        
         private Lazy<BookRepository> bookRepository;
         private Lazy<ReviewRepository> reviewRepository;
         private Lazy<AuthorRepository> authorRepository;
 
-        //створюємо public свойства для наших репозиторіїв 
+        //публічні свойство для роботи з екзмеплярами репозиторіїв
+        /// <summary>
+        /// Екземпляр репозиторія книг
+        /// </summary>
         public BookRepository Books
         {
             get
@@ -30,6 +36,9 @@ namespace BookReview.Arhitecture.Infrastructura.DAL
                 return bookRepository.Value;
             }
         }
+        /// <summary>
+        /// Екземпляр репозиторія рецензій
+        /// </summary>
         public ReviewRepository Reviews
         {
             get
@@ -42,6 +51,9 @@ namespace BookReview.Arhitecture.Infrastructura.DAL
                 return reviewRepository.Value;
             }
         }
+        /// <summary>
+        /// Екземпляр репозиторія авторів
+        /// </summary>
         public AuthorRepository Author
         {
             get
@@ -54,12 +66,18 @@ namespace BookReview.Arhitecture.Infrastructura.DAL
                 return authorRepository.Value;
             }
         }
-
+        /// <summary>
+        /// Зберегти зміни в БД
+        /// </summary>
         public void Save()
         {
             db.SaveChanges();
         }
         private bool disposed = false; 
+        /// <summary>
+        /// Очищення виділеної пам'яті під екземпляр доступу до БД
+        /// </summary>
+        /// <param name="disposing"></param>
         public virtual void Dispose(bool disposing)
         {
             if (this.disposed != true)
@@ -69,6 +87,9 @@ namespace BookReview.Arhitecture.Infrastructura.DAL
                 this.disposed = true;
             }
         }
+        /// <summary>
+        /// Звільнення базового фіналізатора
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
