@@ -31,7 +31,7 @@ namespace BookReview.Controllers
             int pageSize = 10; //скільки обєктів буде на сторінці(авторів)
             IEnumerable<Author> authorPerPages = Authors.Skip((page - 1) * pageSize).Take(pageSize); // отримує ті 10 сторінок, які потрібно вивести
             PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = Authors.Count };
-            IndexViewAuthor authorView = new IndexViewAuthor() { Authors=authorPerPages, PageInfo=pageInfo};
+            IndexViewAuthor authorView = new IndexViewAuthor() { Authors = authorPerPages, PageInfo = pageInfo };
 
             return View(authorView);
         }
@@ -59,7 +59,7 @@ namespace BookReview.Controllers
             int pageSize = 10;
             IEnumerable<Book> BooksPerPage = authorsBooks.Skip((page - 1) * pageSize).Take(pageSize);
             PageInfo pageInfo = new PageInfo() { PageNumber = page, PageSize = pageSize, TotalItems = authorsBooks.Count() };
-            DetailsViewAuthorsAndBooks authorBookView = new DetailsViewAuthorsAndBooks() { Books = BooksPerPage, PageInfo = pageInfo, Author=author };
+            DetailsViewAuthorsAndBooks authorBookView = new DetailsViewAuthorsAndBooks() { Books = BooksPerPage, PageInfo = pageInfo, Author = author };
 
             return View(authorBookView);
         }
@@ -78,7 +78,7 @@ namespace BookReview.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(Author author, List<string> ListOfGenre)
         {
-            if(db.Authors.FirstOrDefault(a =>a.Surname.ToLower() == author.Surname.ToLower()) != null)
+            if (db.Authors.FirstOrDefault(a => a.Surname.ToLower() == author.Surname.ToLower()) != null)
             {
                 HttpContext.Response.Write("<h2>Даний автор вже є в нашій базі даних, добавте йому книжку</h2>");
                 Thread.Sleep(4000);
