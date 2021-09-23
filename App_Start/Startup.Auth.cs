@@ -57,7 +57,7 @@ namespace BookReview
             //app.UseFacebookAuthentication(
             //   appId: "",
             //   appSecret: "");
-
+            //
             app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             {
                 ClientId = "#",
