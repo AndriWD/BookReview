@@ -1,6 +1,7 @@
 ﻿using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using BookReview.Arhitecture.Domain.Models;
 using BookReview.Domain.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -37,6 +38,7 @@ namespace BookReview.Models
 
         public System.Data.Entity.DbSet<BookReview.Domain.Models.Book> Books { get; set; }
         public DbSet<Author> Authors { get; set; }
+        public DbSet<Genre> Genres { get; set; }
         
     }
 }

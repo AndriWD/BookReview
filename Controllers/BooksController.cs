@@ -17,11 +17,10 @@ namespace BookReview.Controllers
     public class BooksController : Controller
     {
         ///функція Create Get + Post
-        private ApplicationDbContext db;
+        private ApplicationDbContext db = new ApplicationDbContext();
         List<Book> Books;
         public BooksController()
         {
-            db = new ApplicationDbContext();
             Books = db.Books.ToList();
         }
 
@@ -109,7 +108,7 @@ namespace BookReview.Controllers
             return View(book);
         }
 
-        private static void DelateIMage(Book book)
+        private static void DelateImage(Book book)
         {
             if(book.PathToImage == null)
             {
@@ -127,65 +126,6 @@ namespace BookReview.Controllers
             {
                 Console.WriteLine("Неідома помилка" + ex.Message);
             }
-        }
-
-        // GET: Books/Edit/5
-        public async Task<ActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Book book = await db.Books.FindAsync(id);
-            if (book == null)
-            {
-                return HttpNotFound();
-            }
-            ViewBag.AuthorId = new SelectList(db.Authors, "AuthorId", "Name", book.AuthorId);
-            return View(book);
-        }
-
-        // POST: Books/Edit/5
-        // Чтобы защититься от атак чрезмерной передачи данных, включите определенные свойства, для которых следует установить привязку. Дополнительные 
-        // сведения см. в разделе https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "BookId,NameOfBook,AuthorId,Vote,VoteCounter,PathToImage")] Book book)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(book).State = EntityState.Modified;
-                await db.SaveChangesAsync();
-                return RedirectToAction("Index");
-            }
-            ViewBag.AuthorId = new SelectList(db.Authors, "AuthorId", "Name", book.AuthorId);
-            return View(book);
-        }
-
-        // GET: Books/Delete/5
-        public async Task<ActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Book book = await db.Books.FindAsync(id);
-            if (book == null)
-            {
-                return HttpNotFound();
-            }
-            return View(book);
-        }
-
-        // POST: Books/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteConfirmed(int id)
-        {
-            Book book = await db.Books.FindAsync(id);
-            db.Books.Remove(book);
-            await db.SaveChangesAsync();
-            return RedirectToAction("Index");
         }
 
         protected override void Dispose(bool disposing)
