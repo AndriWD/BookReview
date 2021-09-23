@@ -1,6 +1,7 @@
 ﻿using BookReview.Domain.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
@@ -18,6 +19,7 @@ namespace BookReview.Arhitecture.Domain.Models
         /// <summary>
         /// Назва Жанру
         /// </summary>
+        [Required]
         public string Name { get; set; }
         /// <summary>
         /// Повертає назву жанру
@@ -40,25 +42,4 @@ namespace BookReview.Arhitecture.Domain.Models
         /// </summary>
         public Genre() { }
     }
-
-    //ActionBook,
-    //    WarBook,
-    //    Detective,
-    //    ChildrensLiteratures,
-    //    Drama,
-    //    HistoricalLiturature,
-    //    Classic,
-    //    ScientFiction,
-    //    AppliedLiterature,
-    //    Politics,
-    //    Adventures,
-    //    Psyhology,
-    //    Novel,
-    //    tales,
-    //    ModernLiterature,
-    //    Trillers,
-    //    Horrors,
-    //    Mistic,
-    //    Fantast,
-    //    Humor
 }

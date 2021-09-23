@@ -14,29 +14,46 @@ using System.Threading;
 
 namespace BookReview.Controllers
 {
+    /// <summary>
+    /// Контролер Авторів
+    /// </summary>
     public class AuthorsController : Controller
     {
         ///функція Create Get + Post
-        private ApplicationDbContext db = new ApplicationDbContext();
-        List<Author> Authors;
+        private readonly ApplicationDbContext db = new ApplicationDbContext();
+        private readonly List<Author> Authors;
+        /// <summary>
+        /// Конструктор
+        /// </summary>
         public AuthorsController()
         {
             Authors = db.Authors.ToList();
         }
 
         // GET: Authors
+        /// <summary>
+        /// Сторінка перегляду авторів
+        /// </summary>
+        /// <param name="page">Необов'язковий параметр - Сторінка</param>
+        /// <returns>Сторінку з авторами</returns>
         public async Task<ActionResult> Index(int page = 1)
         {
-            //ща ми пропишемо, щоб поверталася конкретна кількість авторів, книжок і так далі
-            int pageSize = 10; //скільки обєктів буде на сторінці(авторів)
+            
+            int pageSize = 10; 
             IEnumerable<Author> authorPerPages = Authors.Skip((page - 1) * pageSize).Take(pageSize); // отримує ті 10 сторінок, які потрібно вивести
-            PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = Authors.Count };
+            PageInfo pageInfo = new PageInfo(page, pageSize, Authors.Count);
             IndexViewAuthor authorView = new IndexViewAuthor() { Authors = authorPerPages, PageInfo = pageInfo };
 
             return View(authorView);
         }
 
         // GET: Authors/Details/5
+        /// <summary>
+        /// Інформація про автора за ідентифікатором
+        /// </summary>
+        /// <param name="id">Ідентифікатор</param>
+        /// <param name="page"></param>
+        /// <returns></returns>
         public async Task<ActionResult> Details(int? id, int page = 1)
         {
             if (id == null)
@@ -47,110 +64,63 @@ namespace BookReview.Controllers
             if (author == null)
             {
                 return HttpNotFound();
-            }
-            //нам потрібно разом з автором показати ще книжки тому тут також буде зроблена пагінація інтересненько правда?
+            }          
             IEnumerable<Book> authorsBooks = db.Books.Where(b => b.AuthorId == id);
             if (authorsBooks == null)
             {
                 return HttpNotFound();
             }
 
-            //да ми передаємо вигляд моделі книги, але це щоб не створювати нової лишньої сущності 
+           
             int pageSize = 10;
             IEnumerable<Book> BooksPerPage = authorsBooks.Skip((page - 1) * pageSize).Take(pageSize);
-            PageInfo pageInfo = new PageInfo() { PageNumber = page, PageSize = pageSize, TotalItems = authorsBooks.Count() };
+            PageInfo pageInfo = new PageInfo(page, pageSize, authorsBooks.Count());
             DetailsViewAuthorsAndBooks authorBookView = new DetailsViewAuthorsAndBooks() { Books = BooksPerPage, PageInfo = pageInfo, Author = author };
 
             return View(authorBookView);
         }
 
         // GET: Authors/Create
+        /// <summary>
+        /// Створення автора (GET)
+        /// </summary>
+        /// <returns>Автор</returns>
         public ActionResult Create()
         {
-            ViewBag.Genre = Enum.GetNames(typeof(Genre));
+            ViewBag.Genres = db.Genres.ToList();
             return View();
         }
 
         // POST: Authors/Create
         // Чтобы защититься от атак чрезмерной передачи данных, включите определенные свойства, для которых следует установить привязку. Дополнительные 
         // сведения см. в разделе https://go.microsoft.com/fwlink/?LinkId=317598.
+        /// <summary>
+        /// Створення автора (POST)
+        /// </summary>
+        /// <param name="author">Автора</param>
+        /// <param name="ListOfGenre">Жанри</param>
+        /// <returns>Додавання автора до БД</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(Author author, List<string> ListOfGenre)
+        public async Task<ActionResult> Create(Author author, List<Genre> ListOfGenre)
         {
             if (db.Authors.FirstOrDefault(a => a.Surname.ToLower() == author.Surname.ToLower()) != null)
             {
-                HttpContext.Response.Write("<h2>Даний автор вже є в нашій базі даних, добавте йому книжку</h2>");
+                HttpContext.Response.Write("Даний автор вже є в нашій базі даних, добавте йому книгу");
                 Thread.Sleep(4000);
                 RedirectToAction("Create", "Books");
             }
             else if (ModelState.IsValid)
             {
-                author.Genre = ListOfGenre;
+                author.Genres = ListOfGenre;
 
                 db.Authors.Add(author);
                 await db.SaveChangesAsync();
-                return RedirectToAction("Index");
+                HttpContext.Response.Write("Автор успішно створений, добавте йому першу книгу");
+                return RedirectToAction("Create", "Books");
             }
 
             return View(author);
-        }
-
-        // GET: Authors/Edit/5
-        public async Task<ActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Author author = await db.Authors.FindAsync(id);
-            if (author == null)
-            {
-                return HttpNotFound();
-            }
-            return View(author);
-        }
-
-        // POST: Authors/Edit/5
-        // Чтобы защититься от атак чрезмерной передачи данных, включите определенные свойства, для которых следует установить привязку. Дополнительные 
-        // сведения см. в разделе https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "AuthorId,Name,SurName,Vote,VoteCounter,PathToImage,AboutOfAuthor")] Author author)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(author).State = EntityState.Modified;
-                await db.SaveChangesAsync();
-                return RedirectToAction("Index");
-            }
-            return View(author);
-        }
-
-        // GET: Authors/Delete/5
-        public async Task<ActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Author author = await db.Authors.FindAsync(id);
-            if (author == null)
-            {
-                return HttpNotFound();
-            }
-            return View(author);
-        }
-
-        // POST: Authors/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteConfirmed(int id)
-        {
-            Author author = await db.Authors.FindAsync(id);
-            db.Authors.Remove(author);
-            await db.SaveChangesAsync();
-            return RedirectToAction("Index");
         }
 
         protected override void Dispose(bool disposing)

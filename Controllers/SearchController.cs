@@ -48,7 +48,7 @@ namespace BookReview.Controllers
         [HttpGet]
         public ActionResult AdvancedFilter()
         {
-            ViewBag.Genre = Enum.GetNames(typeof(Genre));
+            ViewBag.Genres = db.Genres;
             return View();
         }
         [HttpPost]
@@ -70,7 +70,7 @@ namespace BookReview.Controllers
             }
             else
             {
-                throw new ArgumentException("Виберіть коректно тип пошкового запиту");
+                HttpContext.Response.Write("Виберіть тип пошукового запиту");
             }
         }
         private async Task<ActionResult> SearchAuthor(string searchQuery, string genre, int page)
@@ -90,13 +90,15 @@ namespace BookReview.Controllers
             }
             else if(searchQuery == null || searchQuery == "")
             {
-                resultFiltersOfAuthors = await db.Authors.Where(a => a.Genre.Contains(genre)).ToListAsync();
+                var currentGenre = await db.Genres.FirstOrDefaultAsync(g => g.Name.Equals(genre, StringComparison.OrdinalIgnoreCase));
+                resultFiltersOfAuthors = (List<Author>)currentGenre.Authors;
                 IndexViewAuthor viewResultFilterOfAuthor = CreateIndexViewAuthor(page, resultFiltersOfAuthors);
                 return PartialView(viewResultFilterOfAuthor);
             }
             else
             {
-                resultFiltersOfAuthors = await db.Authors.Where(a => a.Genre.Contains(genre) && $"{a.Name} {a.Surname}".ToLower().Contains(searchQuery.ToLower())).ToListAsync();
+                var currentGenre = await db.Genres.FirstOrDefaultAsync(g => g.Name.Equals(genre, StringComparison.OrdinalIgnoreCase));
+                resultFiltersOfAuthors = (List<Author>)currentGenre.Authors.Where(a => $"{a.Name} {a.Surname}".ToLower().Contains(searchQuery.ToLower()));                           
                 IndexViewAuthor viewResultFilterOfAuthor = CreateIndexViewAuthor(page, resultFiltersOfAuthors);
                 return PartialView(viewResultFilterOfAuthor);
             }
@@ -118,13 +120,15 @@ namespace BookReview.Controllers
             }
             else if (searchQuery == null || searchQuery == "")
             {
-                resultFiltersOfBook = await db.Books.Where(b => b.Genre.Contains(genre)).ToListAsync();
+                var currentGenre = await db.Genres.FirstOrDefaultAsync(g => g.Name.Equals(genre, StringComparison.OrdinalIgnoreCase));
+                resultFiltersOfBook = (List<Book>)currentGenre.Books;
                 IndexViewBook viewResultFilterOfBook = CreateIndexViewBook(page, resultFiltersOfBook);
                 return PartialView(viewResultFilterOfBook);
             }
             else
             {
-                resultFiltersOfBook = await db.Books.Where(b => b.Genre.Contains(genre) && b.NameOfBook.ToLower().Contains(searchQuery.ToLower())).ToListAsync();
+                var currentGenre = await db.Genres.FirstOrDefaultAsync(g => g.Name.Equals(genre, StringComparison.OrdinalIgnoreCase));
+                resultFiltersOfBook = (List<Book>)currentGenre.Books.Where(b => b.NameOfBook.ToLower().Contains(searchQuery.ToLower()));
                 IndexViewBook viewResultFilterOfBook = CreateIndexViewBook(page, resultFiltersOfBook);
                 return PartialView(viewResultFilterOfBook);
             }
@@ -146,13 +150,15 @@ namespace BookReview.Controllers
             }
             else if (searchQuery == null || searchQuery == "")
             {
-                resultFiltersOfReviews = await db.Reviews.Where(r => r.Book.Genre.Contains(genre)).ToListAsync();
+                var currentGenre = await db.Genres.FirstOrDefaultAsync(g => g.Name.Equals(genre, StringComparison.OrdinalIgnoreCase));
+                resultFiltersOfReviews = (List<Review>)currentGenre.Books.Select(b => b.Reviews);
                 IndexViewReview viewResultFilterOfReview = CreateIndexViewReview(page, resultFiltersOfReviews);
                 return PartialView(viewResultFilterOfReview);
             }
             else
             {
-                resultFiltersOfReviews = await db.Reviews.Where(r => r.Book.Genre.Contains(genre) && r.Book.NameOfBook.ToLower().Contains(searchQuery.ToLower())).ToListAsync();
+                var currentGenre = await db.Genres.FirstOrDefaultAsync(g => g.Name.Equals(genre, StringComparison.OrdinalIgnoreCase));
+                resultFiltersOfReviews = (List<Review>)currentGenre.Books.Where(b => b.NameOfBook.ToLower().Contains(searchQuery.ToLower())).Select(b => b.Reviews);              
                 IndexViewReview viewResultFilterOfReview = CreateIndexViewReview(page, resultFiltersOfReviews);
                 return PartialView(viewResultFilterOfReview);
             }
@@ -161,7 +167,7 @@ namespace BookReview.Controllers
         private static IndexViewAuthor CreateIndexViewAuthor(int page, List<Author> resultFiltersOfAuthors)
         {
             int pageSize = 10;
-            PageInfo pageInfo = new PageInfo() { PageNumber = page, PageSize = pageSize, TotalItems = resultFiltersOfAuthors.Count };
+            PageInfo pageInfo = new PageInfo(page, pageSize, resultFiltersOfAuthors.Count);
             var resultFiltersOfAuthorsPerPage = resultFiltersOfAuthors.Skip((page - 1) * pageSize).Take(pageSize);
             IndexViewAuthor viewResultFilterOfAuthor = new IndexViewAuthor() { PageInfo = pageInfo, Authors = resultFiltersOfAuthorsPerPage };
             return viewResultFilterOfAuthor;
@@ -169,7 +175,7 @@ namespace BookReview.Controllers
         private static IndexViewBook CreateIndexViewBook(int page, List<Book> resultFiltersOfBooks)
         {
             int pageSize = 10;
-            PageInfo pageInfo = new PageInfo() { PageNumber = page, PageSize = pageSize, TotalItems = resultFiltersOfBooks.Count };
+            PageInfo pageInfo = new PageInfo(page, pageSize, resultFiltersOfBooks.Count);
             var resultFiltersOfBooksPerPage = resultFiltersOfBooks.Skip((page - 1) * pageSize).Take(pageSize);
             IndexViewBook viewResultFilterOfBook = new IndexViewBook() { PageInfo = pageInfo, Books = resultFiltersOfBooksPerPage };
             return viewResultFilterOfBook;
@@ -177,7 +183,7 @@ namespace BookReview.Controllers
         private static IndexViewReview CreateIndexViewReview(int page, List<Review> resultFiltersOfReviews)
         {
             int pageSize = 10;
-            PageInfo pageInfo = new PageInfo() { PageNumber = page, PageSize = pageSize, TotalItems = resultFiltersOfReviews.Count };
+            PageInfo pageInfo = new PageInfo(page, pageSize, resultFiltersOfReviews.Count);
             var resultFiltersOfReviewsPerPage = resultFiltersOfReviews.Skip((page - 1) * pageSize).Take(pageSize);
             IndexViewReview viewResultFilterOfReviews = new IndexViewReview() { PageInfo = pageInfo, Reviews = resultFiltersOfReviewsPerPage };
             return viewResultFilterOfReviews;

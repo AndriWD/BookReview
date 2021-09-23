@@ -59,9 +59,10 @@
     <div class="form-group">
         <label class="control-label col-md-2"/>
         <div class="col-md-10">
-            @foreach (var item in ViewBag.Genre)
-            {
-                <input id="ListOfGenre" value="@item"/>
+            @foreach (var item in ViewBag.Genres)
+            {              
+                
+                <input type="checkbox" name="ListOfGenre" id="ListOfGenre" value="@item" />
             }
         </div>
     </div>

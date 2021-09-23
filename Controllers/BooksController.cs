@@ -14,29 +14,46 @@ using BookReview.Arhitecture.Domain.Models;
 
 namespace BookReview.Controllers
 {
+    /// <summary>
+    /// Контролер Книг
+    /// </summary>
     public class BooksController : Controller
     {
         ///функція Create Get + Post
-        private ApplicationDbContext db = new ApplicationDbContext();
-        List<Book> Books;
+        private readonly ApplicationDbContext db = new ApplicationDbContext();
+        private readonly List<Book> Books;
+        /// <summary>
+        /// Конструктор
+        /// </summary>
         public BooksController()
         {
             Books = db.Books.ToList();
         }
 
         // GET: Books
+        /// <summary>
+        /// Початкова сторінка, Показує всі нові книги
+        /// </summary>
+        /// <param name="page">Сторінка</param>
+        /// <returns>Всі книги в зворотньому порядку</returns>
         public async Task<ActionResult> Index(int page = 1)
         {
             IEnumerable<Book> reverseBooks = Books.OrderByDescending(b => b);
             int pageSize = 10;
             IEnumerable<Book> booksPerPages = reverseBooks.Skip((page - 1) * pageSize).Take(pageSize); // отримує ті 10 сторінок, які потрібно вивести
-            PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = Books.Count };
+            PageInfo pageInfo = new PageInfo(page, pageSize, Books.Count);
             IndexViewBook bookView = new IndexViewBook() { Books = booksPerPages, PageInfo = pageInfo };
 
             return View(bookView);
         }
 
         // GET: Books/Details/5
+        /// <summary>
+        /// Отримати книгу за ідентифікатором
+        /// </summary>
+        /// <param name="id">Ідентифікатор</param>
+        /// <param name="page">Сторінка</param>
+        /// <returns>Конкретна книга</returns>
         public async Task<ActionResult> Details(int? id, int page = 1)
         {
             if (id == null)
@@ -52,7 +69,7 @@ namespace BookReview.Controllers
             var reviews = db.Reviews.Where(r => r.BookId == id);
             int pageSize = 5;
             IEnumerable<Review> reviewsPerPage = reviews.Skip((page - 1) * pageSize).Take(pageSize);
-            PageInfo pageInfo = new PageInfo() { PageNumber = page, PageSize = pageSize, TotalItems = reviews.Count() };
+            PageInfo pageInfo = new PageInfo(page, pageSize, reviews.Count());
             DetailsViewBooksAndReviews viewBookReview = new DetailsViewBooksAndReviews() { Book = book, PageInfo = pageInfo, Reviews = reviews };
 
 
@@ -60,9 +77,13 @@ namespace BookReview.Controllers
         }
 
         // GET: Books/Create
+        /// <summary>
+        /// Створити книгу (GET)
+        /// </summary>
+        /// <returns>Форма створення книги</returns>
         public ActionResult Create()
         {
-            ViewBag.Genre = Enum.GetNames(typeof(Genre));
+            ViewBag.Genres = db.Genres.ToList();
             
             return View();
         }
@@ -70,9 +91,16 @@ namespace BookReview.Controllers
         // POST: Books/Create
         // Чтобы защититься от атак чрезмерной передачи данных, включите определенные свойства, для которых следует установить привязку. Дополнительные 
         // сведения см. в разделе https://go.microsoft.com/fwlink/?LinkId=317598.
+        /// <summary>
+        /// Створити книгу (POST)
+        /// </summary>
+        /// <param name="book">Книга</param>
+        /// <param name="SurnameOfAuthor">Прізвище автора</param>
+        /// <param name="ListOfGenre">Жанри</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(Book book, string SurnameOfAuthor, List<string> ListOfGenre)
+        public async Task<ActionResult> Create(Book book, string SurnameOfAuthor, List<Genre> ListOfGenre)
         {
             if (ModelState.IsValid)
             {
@@ -80,35 +108,32 @@ namespace BookReview.Controllers
                 if (db.Authors.Where(a => a.Surname.ToLower() == SurnameOfAuthor.ToLower()) == null)
                 {
                     //видалення картинки
-                    DelateIMage(book);
+                    DeleteImage(book);
 
-                    HttpContext.Response.Write("<h2>Даного автора ще не добавлено до бази даних, будь ласка допоможіть розвинути наш проект з зроблення людей трішки щасливішими;) добавте відомості про автора до нашої бази даних </h2>");
+                    HttpContext.Response.Write("Даного автора ще не добавлено до бази даних, будь ласка допоможіть розвинути наш проект з зроблення людей трішки щасливішими;) добавте відомості про автора до нашої бази даних");
                     
                     Thread.Sleep(4000);
                     RedirectToAction("Create", "Authors");
 
                 }
                 else
-                {
-                    //я забув добавити автора
-                    book.Author = db.Authors.FirstOrDefault(a => a.Surname.ToLower() == SurnameOfAuthor.ToLower());
-                    //але нам ще тепер треба всановити силку автору на книгу
+                {                   
+                    book.Author = db.Authors.FirstOrDefault(a => a.Surname.ToLower() == SurnameOfAuthor.ToLower());                  
                     book.Author.Books.Add(book);
+                    db.Entry(book).State = EntityState.Modified;
                     db.Entry(book.Author).State = EntityState.Modified;
-                    await db.SaveChangesAsync();
-
                     //добавили вибрані 
-                    book.Genre = ListOfGenre;
-
+                    book.Genres = ListOfGenre;
                     db.Books.Add(book);
                     await db.SaveChangesAsync();
+                    HttpContext.Response.Write("Книга успішно створена");
                     return RedirectToAction("Index");
                 }    
             }
             return View(book);
         }
 
-        private static void DelateImage(Book book)
+        private static void DeleteImage(Book book)
         {
             if(book.PathToImage == null)
             {
@@ -124,7 +149,7 @@ namespace BookReview.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Неідома помилка" + ex.Message);
+                Console.WriteLine("Невідома помилка" + ex.Message);
             }
         }
 

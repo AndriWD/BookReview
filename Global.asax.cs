@@ -1,3 +1,5 @@
+using BookReview.Arhitecture.Services;
+using BookReview.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +18,8 @@ namespace BookReview
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            InitialDatabase.Initial(new ApplicationDbContext());
         }
     }
 }

@@ -19,7 +19,7 @@
             <label name="CountOfBooks" class="control-label col-md-2">Кількість книг: @Model.PageInfo.TotalItems </label>
             <label class="center-block">Жанри:</label>
             <div class="btn-group" role="group" aria-label="Basic outlined example">
-                @foreach (var genre in Model.Author.Genre)
+                @foreach (var genre in Model.Author.Genres)
                 {
                     <a href="#" class="btn btn-outline-primary">@genre</a>
                 }
